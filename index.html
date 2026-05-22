@@ -1,0 +1,279 @@
+import React, { useState, useEffect } from 'react';
+
+// Konfigurasi Harga dan Opsi
+const DATA_HARGA = {
+  jenisFoto: [
+    { id: 'wedding', label: 'Wedding', price: 700000 },
+    { id: 'khitanan', label: 'Khitanan', price: 400000 },
+    { id: 'aqiqah', label: 'Aqiqah', price: 400000 },
+    { id: 'studio', label: 'Studio', price: 20000 },
+  ],
+  jumlahOrang: [
+    { id: '2', label: '2 Orang', price: 10000 },
+    { id: '3', label: '3 Orang', price: 25000 },
+    { id: '4', label: '4 Orang', price: 35000 },
+    { id: '5', label: '5 Orang', price: 50000 },
+    { id: '6-8', label: '6 - 8 Orang', price: 70000 },
+    { id: '9-10', label: '9 - 10 Orang', price: 120000 },
+  ],
+  durasi: {
+    studio: [
+      { id: '15m', label: '15 Menit', price: 10000 },
+      { id: '30m', label: '30 Menit', price: 25000 },
+      { id: '60m', label: '60 Menit', price: 40000 },
+    ],
+    wedding: [
+      { id: '8h', label: '8 Jam', price: 200000 },
+      { id: '10h', label: '10 Jam', price: 350000 },
+      { id: 'fullday', label: 'Full Day', price: 500000 },
+    ],
+    khitanan: [
+      { id: '4h', label: '4 Jam', price: 50000 },
+      { id: '8h', label: '8 Jam', price: 100000 },
+      { id: 'fullday', label: 'Full Day', price: 200000 },
+    ],
+    aqiqah: [
+      { id: '4h', label: '4 Jam', price: 50000 },
+      { id: '8h', label: '8 Jam', price: 100000 },
+      { id: 'fullday', label: 'Full Day', price: 200000 },
+    ]
+  },
+  cetak: [
+    { id: 'none', label: 'Tanpa Cetak', price: 0 },
+    { id: '1r12r', label: '1 roll + 12R', price: 200000 },
+    { id: '2r16r', label: '2 roll + 16R', price: 350000 },
+    { id: '3r18r', label: '3 roll + 18R', price: 400000 },
+  ]
+};
+
+// Helper untuk format mata uang Rupiah
+const formatRupiah = (number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(number);
+};
+
+export default function MasMotretCalculator() {
+  // State untuk menyimpan pilihan user
+  const [jenisFoto, setJenisFoto] = useState('');
+  const [jumlahOrang, setJumlahOrang] = useState('');
+  const [durasi, setDurasi] = useState('');
+  const [cetak, setCetak] = useState('');
+  const [totalHarga, setTotalHarga] = useState(0);
+
+  // Effect untuk menghitung total harga setiap kali ada perubahan pilihan
+  useEffect(() => {
+    let total = 0;
+
+    // Tambah harga jenis foto
+    if (jenisFoto) {
+      const selectedJenis = DATA_HARGA.jenisFoto.find(item => item.id === jenisFoto);
+      if (selectedJenis) total += selectedJenis.price;
+    }
+
+    // Tambah harga jumlah orang
+    if (jumlahOrang) {
+      const selectedOrang = DATA_HARGA.jumlahOrang.find(item => item.id === jumlahOrang);
+      if (selectedOrang) total += selectedOrang.price;
+    }
+
+    // Tambah harga durasi (sesuai kategori yang dipilih)
+    if (jenisFoto && durasi) {
+      const opsiDurasi = DATA_HARGA.durasi[jenisFoto] || [];
+      const selectedDurasi = opsiDurasi.find(item => item.id === durasi);
+      if (selectedDurasi) total += selectedDurasi.price;
+    }
+
+    // Tambah harga cetak
+    if (cetak) {
+      const selectedCetak = DATA_HARGA.cetak.find(item => item.id === cetak);
+      if (selectedCetak) total += selectedCetak.price;
+    }
+
+    setTotalHarga(total);
+  }, [jenisFoto, jumlahOrang, durasi, cetak]);
+
+  // Handler ketika jenis foto diubah (reset durasi karena opsinya berbeda)
+  const handleJenisFotoChange = (e) => {
+    setJenisFoto(e.target.value);
+    setDurasi(''); // Reset durasi setiap kali jenis foto berubah
+  };
+
+  // Handler untuk tombol WhatsApp
+  const handlePesanWA = () => {
+    if (totalHarga === 0) return; // Jangan kirim jika kosong
+
+    // Cari label untuk pesan
+    const lJenis = DATA_HARGA.jenisFoto.find(i => i.id === jenisFoto)?.label || '-';
+    const lOrang = DATA_HARGA.jumlahOrang.find(i => i.id === jumlahOrang)?.label || '-';
+    const lDurasi = jenisFoto && durasi ? DATA_HARGA.durasi[jenisFoto].find(i => i.id === durasi)?.label : '-';
+    const lCetak = DATA_HARGA.cetak.find(i => i.id === cetak)?.label || '-';
+
+    const text = `Halo Mas Motret! Saya ingin booking sesi foto dengan rincian berikut:%0A%0A` +
+      `📸 *Jenis Foto:* ${lJenis}%0A` +
+      `👥 *Jumlah Orang:* ${lOrang}%0A` +
+      `⏱️ *Durasi:* ${lDurasi}%0A` +
+      `🖨️ *Cetak:* ${lCetak}%0A%0A` +
+      `💰 *Estimasi Total:* ${formatRupiah(totalHarga)}%0A%0A` +
+      `Apakah ada jadwal kosong?`;
+
+    // Ganti dengan nomor WA bisnis yang sebenarnya
+    window.open(`https://wa.me/6281234567890?text=${text}`, '_blank');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex justify-center items-center p-4 font-sans text-gray-800">
+      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        
+        {/* Header Section */}
+        <div className="bg-gray-900 px-8 py-8 text-center relative overflow-hidden">
+          {/* Akses oranye dekoratif */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
+          
+          <h2 className="text-3xl font-bold text-white mb-2 flex items-center justify-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-orange-500"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            Mas Motret
+          </h2>
+          <p className="text-gray-400 text-sm">Estimasi Biaya Layanan Fotografi</p>
+        </div>
+
+        {/* Form Section */}
+        <div className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {}
+            {/* 1. Jenis Foto */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                Jenis Foto
+              </label>
+              <div className="relative">
+                <select 
+                  value={jenisFoto} 
+                  onChange={handleJenisFotoChange}
+                  className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                >
+                  <option value="" disabled>Pilih Kategori Foto...</option>
+                  {DATA_HARGA.jenisFoto.map(opsi => (
+                    <option key={opsi.id} value={opsi.id}>
+                      {opsi.label} (+ {formatRupiah(opsi.price)})
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Jumlah Orang */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                Jumlah Orang
+              </label>
+              <div className="relative">
+                <select 
+                  value={jumlahOrang} 
+                  onChange={(e) => setJumlahOrang(e.target.value)}
+                  className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                >
+                  <option value="" disabled>Pilih Jumlah Peserta...</option>
+                  {DATA_HARGA.jumlahOrang.map(opsi => (
+                    <option key={opsi.id} value={opsi.id}>
+                      {opsi.label} (+ {formatRupiah(opsi.price)})
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            {}
+            {/* 3. Durasi (Kondisional) */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                Durasi Waktu
+              </label>
+              <div className="relative">
+                <select 
+                  value={durasi} 
+                  onChange={(e) => setDurasi(e.target.value)}
+                  disabled={!jenisFoto}
+                  className={`w-full appearance-none border py-3 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all cursor-pointer ${!jenisFoto ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-50 border-gray-200 text-gray-700 focus:border-transparent'}`}
+                >
+                  <option value="" disabled>
+                    {!jenisFoto ? 'Pilih Jenis Foto Terlebih Dahulu' : 'Pilih Durasi...'}
+                  </option>
+                  
+                  {jenisFoto && DATA_HARGA.durasi[jenisFoto]?.map(opsi => (
+                    <option key={opsi.id} value={opsi.id}>
+                      {opsi.label} (+ {formatRupiah(opsi.price)})
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Pilihan Cetak */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                Pilihan Cetak (Opsional)
+              </label>
+              <div className="relative">
+                <select 
+                  value={cetak} 
+                  onChange={(e) => setCetak(e.target.value)}
+                  className="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all cursor-pointer"
+                >
+                  <option value="" disabled>Pilih Paket Cetak...</option>
+                  {DATA_HARGA.cetak.map(opsi => (
+                    <option key={opsi.id} value={opsi.id}>
+                      {opsi.label} {opsi.price > 0 ? `(+ ${formatRupiah(opsi.price)})` : ''}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {}
+          {/* Total Box */}
+          <div className="mt-10 bg-orange-50 rounded-2xl p-6 border-2 border-orange-100 flex flex-col md:flex-row items-center justify-between gap-4 transition-all">
+            <div className="text-center md:text-left">
+              <p className="text-sm font-medium text-orange-800 uppercase tracking-wide mb-1">Estimasi Total Harga</p>
+              <p className="text-4xl font-black text-gray-900 tracking-tight">
+                {formatRupiah(totalHarga)}
+              </p>
+              <p className="text-xs text-orange-600 mt-1">*Harga dapat berubah sesuai kesepakatan final</p>
+            </div>
+
+            {/* CTA Button */}
+            <button 
+              onClick={handlePesanWA}
+              disabled={totalHarga === 0}
+              className={`w-full md:w-auto flex items-center justify-center gap-2 py-4 px-8 rounded-xl font-bold text-white transition-all transform ${
+                totalHarga === 0 
+                ? 'bg-gray-300 cursor-not-allowed' 
+                : 'bg-orange-500 hover:bg-orange-600 hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-200 cursor-pointer'
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Pesan Jadwal via WA
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
