@@ -1,127 +1,286 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mas Motret Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricelist MasMotret</title>
 
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: sans-serif;
+      background: #f5f5f5;
+    }
+
+    .gallery-item img {
+      transition: 0.4s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 20px;
     }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<body>
 
-  <div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
+  <!-- LIGHTBOX -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="preview">
+  </div>
 
-    <!-- Header -->
-    <div class="bg-gray-900 px-8 py-8 text-center relative">
-      <div class="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
+  <!-- WRAPPER -->
+  <div class="max-w-7xl mx-auto p-4 md:p-8">
 
-      <h1 class="text-3xl font-bold text-white mb-2">
-        📸 Mas Motret
-      </h1>
+    <!-- HERO -->
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200 mb-10">
 
-      <p class="text-gray-400 text-sm">
-        Estimasi Biaya Layanan Fotografi
+      <div class="bg-gray-900 px-8 py-10 text-center relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
+
+        <div class="flex items-center justify-center gap-4 mb-3">
+          <img
+            src="logo.png"
+            alt="Logo"
+            class="w-16 h-16 object-contain rounded-full bg-white p-2"
+          >
+
+          <h1 class="text-4xl md:text-5xl font-black text-white tracking-wide">
+            MASMOTRET
+          </h1>
+        </div>
+
+        <p class="text-gray-400 text-sm md:text-base">
+          Pricelist & Booking Fotografi Profesional
+        </p>
+      </div>
+
+      <!-- FORM -->
+      <div class="p-8">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- JENIS FOTO -->
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">
+              Jenis Foto
+            </label>
+
+            <select
+              id="jenisFoto"
+              class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">Pilih Jenis Foto...</option>
+            </select>
+          </div>
+
+          <!-- JUMLAH ORANG -->
+          <div id="jumlahOrangContainer">
+            <label class="block text-sm font-bold text-gray-700 mb-2">
+              Jumlah Orang
+            </label>
+
+            <select
+              id="jumlahOrang"
+              class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">Pilih Jumlah Orang...</option>
+            </select>
+          </div>
+
+          <!-- DURASI -->
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">
+              Durasi / Paket
+            </label>
+
+            <select
+              id="durasi"
+              class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">Pilih Durasi...</option>
+            </select>
+          </div>
+
+          <!-- ALBUM -->
+          <div id="albumContainer">
+            <label class="block text-sm font-bold text-gray-700 mb-2">
+              Album / Roll
+            </label>
+
+            <select
+              id="album"
+              class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">Pilih Album...</option>
+            </select>
+          </div>
+
+          <!-- BINGKAI -->
+          <div id="bingkaiContainer">
+            <label class="block text-sm font-bold text-gray-700 mb-2">
+              Bingkai
+            </label>
+
+            <select
+              id="bingkai"
+              class="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">Pilih Bingkai...</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- TOTAL -->
+        <div class="mt-10 bg-orange-50 border-2 border-orange-100 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+
+          <div>
+            <p class="text-sm font-bold uppercase tracking-wide text-orange-700 mb-2">
+              Estimasi Total Harga
+            </p>
+
+            <h2
+              id="totalHarga"
+              class="text-4xl md:text-5xl font-black text-gray-900"
+            >
+              Rp0
+            </h2>
+
+            <p class="text-xs text-orange-600 mt-2">
+              *Harga dapat berubah sesuai kesepakatan final
+            </p>
+          </div>
+
+          <button
+            id="btnWA"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-5 rounded-2xl transition-all hover:-translate-y-1 shadow-lg shadow-orange-200 w-full md:w-auto"
+          >
+            Pesan Jadwal via WhatsApp
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- KEUNGGULAN -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-12">
+
+      <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
+        <div class="text-4xl mb-3">⚡</div>
+        <h3 class="font-bold text-lg mb-2">Fast Editing</h3>
+        <p class="text-sm text-gray-500">
+          Hasil cepat dengan kualitas maksimal.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
+        <div class="text-4xl mb-3">🎨</div>
+        <h3 class="font-bold text-lg mb-2">Natural Color</h3>
+        <p class="text-sm text-gray-500">
+          Warna foto lebih hidup dan elegan.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
+        <div class="text-4xl mb-3">💰</div>
+        <h3 class="font-bold text-lg mb-2">Affordable Price</h3>
+        <p class="text-sm text-gray-500">
+          Harga ramah dengan kualitas premium.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 shadow-lg text-center">
+        <div class="text-4xl mb-3">🤝</div>
+        <h3 class="font-bold text-lg mb-2">Friendly Service</h3>
+        <p class="text-sm text-gray-500">
+          Konsultasi santai dan nyaman.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="mb-8 text-center">
+      <h2 class="text-4xl font-black text-gray-900 mb-3">
+        Portfolio MasMotret
+      </h2>
+
+      <p class="text-gray-500">
+        Dokumentasi terbaik dari berbagai momen spesial.
       </p>
     </div>
 
-    <!-- Content -->
-    <div class="p-8">
+    <!-- FILTER -->
+    <div class="flex flex-wrap justify-center gap-3 mb-10">
+      <button class="filter-btn bg-orange-500 text-white px-5 py-3 rounded-full font-bold" data-filter="all">
+        Semua
+      </button>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <button class="filter-btn bg-white px-5 py-3 rounded-full font-bold shadow" data-filter="wedding">
+        Wedding
+      </button>
 
-        <!-- Jenis Foto -->
-        <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-700">
-            Jenis Foto
-          </label>
+      <button class="filter-btn bg-white px-5 py-3 rounded-full font-bold shadow" data-filter="studio">
+        Studio
+      </button>
 
-          <select id="jenisFoto"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500">
-            <option value="">Pilih Jenis Foto...</option>
-          </select>
-        </div>
+      <button class="filter-btn bg-white px-5 py-3 rounded-full font-bold shadow" data-filter="engagement">
+        Engagement
+      </button>
 
-        <!-- Jumlah Orang -->
-        <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-700">
-            Jumlah Orang
-          </label>
+      <button class="filter-btn bg-white px-5 py-3 rounded-full font-bold shadow" data-filter="akad">
+        Akad
+      </button>
 
-          <select id="jumlahOrang"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500">
-            <option value="">Pilih Jumlah Orang...</option>
-          </select>
-        </div>
+      <button class="filter-btn bg-white px-5 py-3 rounded-full font-bold shadow" data-filter="aqiqah">
+        Aqiqah
+      </button>
 
-        <!-- Durasi -->
-        <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-700">
-            Durasi
-          </label>
-
-          <select id="durasi"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500">
-            <option value="">Pilih Durasi...</option>
-          </select>
-        </div>
-
-        <!-- Cetak -->
-        <div>
-          <label class="block text-sm font-semibold mb-2 text-gray-700">
-            Pilihan Cetak
-          </label>
-
-          <select id="cetak"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-orange-500">
-            <option value="">Pilih Paket Cetak...</option>
-          </select>
-        </div>
-
-      </div>
-
-      <!-- Total -->
-      <div class="mt-10 bg-orange-50 border-2 border-orange-100 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-
-        <div>
-          <p class="text-sm uppercase tracking-wide text-orange-700 font-semibold">
-            Estimasi Total Harga
-          </p>
-
-          <h2 id="totalHarga"
-            class="text-4xl font-black text-gray-900 mt-1">
-            Rp0
-          </h2>
-
-          <p class="text-xs text-orange-600 mt-2">
-            *Harga dapat berubah sesuai kesepakatan final
-          </p>
-        </div>
-
-        <button id="btnWA"
-          class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl transition-all w-full md:w-auto">
-          Pesan via WhatsApp
-        </button>
-
-      </div>
-
+      <button class="filter-btn bg-white px-5 py-3 rounded-full font-bold shadow" data-filter="khitanan">
+        Khitanan
+      </button>
     </div>
+
+    <!-- GALLERY -->
+    <div id="gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-16"></div>
 
   </div>
 
   <script>
-    const DATA_HARGA = {
+
+    const DATA = {
+
       jenisFoto: [
-        { id: 'wedding', label: 'Wedding', price: 700000 },
-        { id: 'khitanan', label: 'Khitanan', price: 400000 },
-        { id: 'aqiqah', label: 'Aqiqah', price: 400000 },
-        { id: 'studio', label: 'Studio', price: 20000 },
+        { id: 'studio', label: 'Studio' },
+        { id: 'wedding', label: 'Wedding' },
+        { id: 'engagement', label: 'Engagement' },
+        { id: 'akad', label: 'Akad' },
+        { id: 'khitanan', label: 'Khitanan' },
+        { id: 'aqiqah', label: 'Aqiqah' },
       ],
 
       jumlahOrang: [
@@ -134,118 +293,356 @@
       ],
 
       durasi: {
+
         studio: [
-          { id: '15m', label: '15 Menit', price: 10000 },
-          { id: '30m', label: '30 Menit', price: 25000 },
-          { id: '60m', label: '60 Menit', price: 40000 },
+          {
+            id: '10m',
+            label: '10 Menit',
+            price: 15000
+          },
+
+          {
+            id: '30m',
+            label: '30 Menit 🔥 DISKON',
+            price: 35000,
+            oldPrice: 45000
+          },
+
+          {
+            id: '60m',
+            label: '60 Menit 💥 HEMAT',
+            price: 55000,
+            oldPrice: 90000
+          }
         ],
 
         wedding: [
-          { id: '8h', label: '8 Jam', price: 200000 },
-          { id: '10h', label: '10 Jam', price: 350000 },
-          { id: 'fullday', label: 'Full Day', price: 500000 },
+          {
+            id: '4h',
+            label: '4 Jam',
+            price: 600000
+          },
+
+          {
+            id: '10h',
+            label: '10 Jam',
+            price: 1500000
+          },
+
+          {
+            id: 'full',
+            label: 'Full Day',
+            price: 1800000
+          }
+        ],
+
+        engagement: [
+          {
+            id: 'full',
+            label: 'Full Acara',
+            price: 330000
+          }
+        ],
+
+        akad: [
+          {
+            id: 'full',
+            label: 'Full Acara',
+            price: 400000
+          }
         ],
 
         khitanan: [
-          { id: '4h', label: '4 Jam', price: 50000 },
-          { id: '8h', label: '8 Jam', price: 100000 },
-          { id: 'fullday', label: 'Full Day', price: 200000 },
+          {
+            id: '4h',
+            label: '4 Jam',
+            price: 50000
+          },
+
+          {
+            id: '8h',
+            label: '8 Jam',
+            price: 100000
+          },
+
+          {
+            id: 'full',
+            label: 'Full Day',
+            price: 200000
+          }
         ],
 
         aqiqah: [
-          { id: '4h', label: '4 Jam', price: 50000 },
-          { id: '8h', label: '8 Jam', price: 100000 },
-          { id: 'fullday', label: 'Full Day', price: 200000 },
+          {
+            id: '4h',
+            label: '4 Jam',
+            price: 50000
+          },
+
+          {
+            id: '8h',
+            label: '8 Jam',
+            price: 100000
+          },
+
+          {
+            id: 'full',
+            label: 'Full Day',
+            price: 200000
+          }
         ]
       },
 
-      cetak: [
-        { id: 'none', label: 'Tanpa Cetak', price: 0 },
-        { id: '1r12r', label: '1 Roll + 12R', price: 200000 },
-        { id: '2r16r', label: '2 Roll + 16R', price: 350000 },
-        { id: '3r18r', label: '3 Roll + 18R', price: 400000 },
+      album: [
+        {
+          id: '1',
+          label: '1 Roll',
+          price: 120000
+        },
+
+        {
+          id: '2',
+          label: '2 Roll',
+          price: 220000
+        },
+
+        {
+          id: '3',
+          label: '3 Roll',
+          price: 300000
+        }
+      ],
+
+      bingkai: [
+        {
+          id: '10r',
+          label: '10R',
+          price: 50000
+        },
+
+        {
+          id: '12r',
+          label: '12R',
+          price: 70000
+        },
+
+        {
+          id: '16r',
+          label: '16R',
+          price: 95000
+        },
+
+        {
+          id: '18r',
+          label: '18R',
+          price: 110000
+        }
       ]
+
+    };
+
+    const portfolio = {
+
+      wedding: [
+        'images/wedding/1.jpg',
+        'images/wedding/2.jpg',
+        'images/wedding/3.jpg',
+        'images/wedding/4.jpg',
+        'images/wedding/5.jpg',
+        'images/wedding/6.jpg',
+        'images/wedding/7.jpg',
+        'images/wedding/8.jpg',
+        'images/wedding/9.jpg',
+        'images/wedding/10.jpg'
+      ],
+
+      studio: [
+        'images/studio/1.jpg',
+        'images/studio/2.jpg',
+        'images/studio/3.jpg',
+        'images/studio/4.jpg',
+        'images/studio/5.jpg',
+        'images/studio/6.jpg',
+        'images/studio/7.jpg',
+        'images/studio/8.jpg',
+        'images/studio/9.jpg',
+        'images/studio/10.jpg'
+      ],
+
+      engagement: [
+        'images/engagement/1.jpg',
+        'images/engagement/2.jpg',
+        'images/engagement/3.jpg',
+        'images/engagement/4.jpg',
+        'images/engagement/5.jpg',
+        'images/engagement/6.jpg',
+        'images/engagement/7.jpg',
+        'images/engagement/8.jpg',
+        'images/engagement/9.jpg',
+        'images/engagement/10.jpg'
+      ],
+
+      akad: [
+        'images/akad/1.jpg',
+        'images/akad/2.jpg',
+        'images/akad/3.jpg',
+        'images/akad/4.jpg',
+        'images/akad/5.jpg',
+        'images/akad/6.jpg',
+        'images/akad/7.jpg',
+        'images/akad/8.jpg',
+        'images/akad/9.jpg',
+        'images/akad/10.jpg'
+      ],
+
+      aqiqah: [
+        'images/aqiqah/1.jpg',
+        'images/aqiqah/2.jpg',
+        'images/aqiqah/3.jpg',
+        'images/aqiqah/4.jpg',
+        'images/aqiqah/5.jpg',
+        'images/aqiqah/6.jpg',
+        'images/aqiqah/7.jpg',
+        'images/aqiqah/8.jpg',
+        'images/aqiqah/9.jpg',
+        'images/aqiqah/10.jpg'
+      ],
+
+      khitanan: [
+        'images/khitanan/1.jpg',
+        'images/khitanan/2.jpg',
+        'images/khitanan/3.jpg',
+        'images/khitanan/4.jpg',
+        'images/khitanan/5.jpg',
+        'images/khitanan/6.jpg',
+        'images/khitanan/7.jpg',
+        'images/khitanan/8.jpg',
+        'images/khitanan/9.jpg',
+        'images/khitanan/10.jpg'
+      ]
+
     };
 
     const jenisFoto = document.getElementById('jenisFoto');
     const jumlahOrang = document.getElementById('jumlahOrang');
     const durasi = document.getElementById('durasi');
-    const cetak = document.getElementById('cetak');
+    const album = document.getElementById('album');
+    const bingkai = document.getElementById('bingkai');
     const totalHarga = document.getElementById('totalHarga');
-    const btnWA = document.getElementById('btnWA');
 
-    function formatRupiah(angka) {
+    const jumlahOrangContainer = document.getElementById('jumlahOrangContainer');
+    const albumContainer = document.getElementById('albumContainer');
+    const bingkaiContainer = document.getElementById('bingkaiContainer');
+
+    function formatRupiah(number) {
       return new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0
-      }).format(angka);
+      }).format(number);
     }
 
-    function isiSelect(select, data) {
+    function fillSelect(select, data, showPrice = true) {
+
       data.forEach(item => {
+
         const option = document.createElement('option');
 
         option.value = item.id;
-        option.textContent =
-          `${item.label} (+ ${formatRupiah(item.price)})`;
+
+        if (showPrice) {
+          option.textContent = `${item.label} (+ ${formatRupiah(item.price)})`;
+        } else {
+          option.textContent = item.label;
+        }
 
         select.appendChild(option);
       });
     }
 
-    isiSelect(jenisFoto, DATA_HARGA.jenisFoto);
-    isiSelect(jumlahOrang, DATA_HARGA.jumlahOrang);
-    isiSelect(cetak, DATA_HARGA.cetak);
+    fillSelect(jenisFoto, DATA.jenisFoto, false);
+    fillSelect(jumlahOrang, DATA.jumlahOrang);
+    fillSelect(album, DATA.album);
+    fillSelect(bingkai, DATA.bingkai);
 
     function updateDurasi() {
-      durasi.innerHTML =
-        '<option value="">Pilih Durasi...</option>';
 
-      const selectedJenis = jenisFoto.value;
+      durasi.innerHTML = '<option value="">Pilih Durasi...</option>';
 
-      if (!selectedJenis) return;
+      const selected = jenisFoto.value;
 
-      DATA_HARGA.durasi[selectedJenis].forEach(item => {
+      if (!selected) return;
+
+      DATA.durasi[selected].forEach(item => {
+
         const option = document.createElement('option');
 
         option.value = item.id;
-        option.textContent =
-          `${item.label} (+ ${formatRupiah(item.price)})`;
+
+        if (item.oldPrice) {
+          option.textContent = `${item.label} (${formatRupiah(item.oldPrice)} → ${formatRupiah(item.price)})`;
+        } else {
+          option.textContent = `${item.label} (+ ${formatRupiah(item.price)})`;
+        }
 
         durasi.appendChild(option);
       });
     }
 
+    function handleVisibility() {
+
+      const selected = jenisFoto.value;
+
+      if (selected === 'studio') {
+
+        jumlahOrangContainer.style.display = 'block';
+        albumContainer.style.display = 'none';
+        bingkaiContainer.style.display = 'none';
+
+      } else {
+
+        jumlahOrangContainer.style.display = 'none';
+        albumContainer.style.display = 'block';
+        bingkaiContainer.style.display = 'block';
+      }
+    }
+
     function hitungTotal() {
+
       let total = 0;
 
-      const jenis =
-        DATA_HARGA.jenisFoto.find(
-          item => item.id === jenisFoto.value
+      const selectedJenis = jenisFoto.value;
+
+      if (selectedJenis && durasi.value) {
+
+        const paket = DATA.durasi[selectedJenis].find(
+          item => item.id === durasi.value
         );
 
-      const orang =
-        DATA_HARGA.jumlahOrang.find(
+        if (paket) total += paket.price;
+      }
+
+      if (selectedJenis === 'studio') {
+
+        const orang = DATA.jumlahOrang.find(
           item => item.id === jumlahOrang.value
         );
 
-      const cetakItem =
-        DATA_HARGA.cetak.find(
-          item => item.id === cetak.value
+        if (orang) total += orang.price;
+      }
+
+      if (selectedJenis !== 'studio') {
+
+        const albumData = DATA.album.find(
+          item => item.id === album.value
         );
 
-      if (jenis) total += jenis.price;
-      if (orang) total += orang.price;
-      if (cetakItem) total += cetakItem.price;
+        const bingkaiData = DATA.bingkai.find(
+          item => item.id === bingkai.value
+        );
 
-      if (jenisFoto.value && durasi.value) {
-        const durasiItem =
-          DATA_HARGA.durasi[jenisFoto.value].find(
-            item => item.id === durasi.value
-          );
-
-        if (durasiItem) total += durasiItem.price;
+        if (albumData) total += albumData.price;
+        if (bingkaiData) total += bingkaiData.price;
       }
 
       totalHarga.textContent = formatRupiah(total);
@@ -253,14 +650,17 @@
 
     jenisFoto.addEventListener('change', () => {
       updateDurasi();
+      handleVisibility();
       hitungTotal();
     });
 
     jumlahOrang.addEventListener('change', hitungTotal);
     durasi.addEventListener('change', hitungTotal);
-    cetak.addEventListener('change', hitungTotal);
+    album.addEventListener('change', hitungTotal);
+    bingkai.addEventListener('change', hitungTotal);
 
-    btnWA.addEventListener('click', () => {
+    document.getElementById('btnWA').addEventListener('click', () => {
+
       const total = totalHarga.textContent;
 
       if (total === 'Rp0') {
@@ -268,19 +668,108 @@
         return;
       }
 
-      const text =
-        `Halo Mas Motret! Saya ingin booking foto.%0A%0A` +
-        `📸 Jenis Foto: ${jenisFoto.options[jenisFoto.selectedIndex].text}%0A` +
-        `👥 Jumlah Orang: ${jumlahOrang.options[jumlahOrang.selectedIndex].text}%0A` +
-        `⏱️ Durasi: ${durasi.options[durasi.selectedIndex]?.text || '-'}%0A` +
-        `🖨️ Cetak: ${cetak.options[cetak.selectedIndex].text}%0A%0A` +
-        `💰 Total: ${total}`;
+      const jenisText = jenisFoto.options[jenisFoto.selectedIndex]?.text || '-';
+      const durasiText = durasi.options[durasi.selectedIndex]?.text || '-';
+      const albumText = album.options[album.selectedIndex]?.text || '-';
+      const bingkaiText = bingkai.options[bingkai.selectedIndex]?.text || '-';
+      const orangText = jumlahOrang.options[jumlahOrang.selectedIndex]?.text || '-';
+
+      let text = `Halo MasMotret! Saya ingin booking sesi foto.%0A%0A`;
+
+      text += `📸 Jenis Foto: ${jenisText}%0A`;
+      text += `⏱️ Paket: ${durasiText}%0A`;
+
+      if (jenisFoto.value === 'studio') {
+        text += `👥 Jumlah Orang: ${orangText}%0A`;
+      } else {
+        text += `📚 Album: ${albumText}%0A`;
+        text += `🖼️ Bingkai: ${bingkaiText}%0A`;
+      }
+
+      text += `%0A💰 Total: ${total}`;
 
       window.open(
-        `https://wa.me/6281234567890?text=${text}`,
+        `https://wa.me/6285724129496?text=${text}`,
         '_blank'
       );
     });
+
+    // GALLERY
+
+    const gallery = document.getElementById('gallery');
+
+    function renderGallery(category = 'all') {
+
+      gallery.innerHTML = '';
+
+      let items = [];
+
+      if (category === 'all') {
+
+        Object.keys(portfolio).forEach(key => {
+
+          portfolio[key].forEach(image => {
+            items.push({ category: key, image });
+          });
+        });
+
+      } else {
+
+        portfolio[category].forEach(image => {
+          items.push({ category, image });
+        });
+      }
+
+      items.forEach(item => {
+
+        gallery.innerHTML += `
+          <div class="gallery-item bg-white rounded-3xl overflow-hidden shadow-lg cursor-pointer" onclick="openLightbox('${item.image}')">
+
+            <div class="relative overflow-hidden">
+              <img
+                src="${item.image}"
+                class="w-full h-64 object-cover"
+              >
+
+              <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-4">
+                <p class="text-white font-bold capitalize">
+                  ${item.category}
+                </p>
+              </div>
+            </div>
+
+          </div>
+        `;
+      });
+    }
+
+    renderGallery();
+
+    document.querySelectorAll('.filter-btn').forEach(button => {
+
+      button.addEventListener('click', () => {
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.classList.remove('bg-orange-500', 'text-white');
+          btn.classList.add('bg-white');
+        });
+
+        button.classList.remove('bg-white');
+        button.classList.add('bg-orange-500', 'text-white');
+
+        renderGallery(button.dataset.filter);
+      });
+    });
+
+    function openLightbox(image) {
+      document.getElementById('lightbox').style.display = 'flex';
+      document.getElementById('lightboxImg').src = image;
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+    }
+
   </script>
 
 </body>
